@@ -8,7 +8,7 @@ library(dplyr)
 library(data.table)
 
 # Set working directory
-setwd("C:/Users/dzrna/Desktop/Yuan Zou/Age")
+setwd("~/Age")
 
 # Read and sort the dataset using PERMCO and date
 crsp <- fread("crsp_permno.csv")
