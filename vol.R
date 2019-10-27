@@ -6,6 +6,7 @@ library(ggplot2)
 library(lubridate)
 library(dplyr)
 library(data.table)
+library(plm)
 
 # Set working directory
 setwd("~/Age")
@@ -120,3 +121,32 @@ fwrite(vol_y,"age_vol.csv")
 
 # Draw a figure the show the relationship between volatility and age
 ggplot(vol_y,aes(age,volatility))+geom_point(colour="red",size=1)
+
+
+
+# I further exclude the influence from the market to calculate the idiosyncratic volatility
+# I use the fama-french 3 factors model, and the data was drawn from Kenneth French's website.
+ff3 <- fread("F-F_Research_Data_Factors_daily.csv")
+
+# Merge the two datasets
+crsp_ff3 <- inner_join(crsp,ff3, by="date")
+crsp_ff3 <- crsp_ff3 %>% rename(MKT=Mkt-RF) %>%
+  distinct(PERMNO,date, .keep_all= T)
+
+# Run the regression to get the residuals
+plm_reg <- plm(RET ~ MKT+SMB+HML,data = crsp_ff3, index = c("PERMNO","date"))
+crsp_ff3$residuals <- residuals(plm_reg)
+remove(plm_reg)
+
+# Calculate the idiosyncratic volatiliy
+volatility_1_i <- function(x){
+  ret <- x$residuals
+  SD_i=sd(ret[1:253])
+  return(as.data.frame(SD_i)) 
+}
+
+vol_1_i <- crsp_ff3 %>% group_by(PERMNO) %>%
+  do(volatility_1_i(.)) %>%
+  ungroup()
+
+# The the rest of the analysis for idiosyncratic volatility can be reproduced just as the one above
