@@ -157,10 +157,11 @@ from crsp_prc
 group by date;
 endrsubmit;
 
-
+rsubmit;
 proc sort data=crsp_prc_1 out=crsp_prc_1;
 by permno;
 run;
+endrsubmit;
 
 /* Calculate the intraday open to open returns */
 rsubmit;
