@@ -1,4 +1,5 @@
 /* This SAS code intend to calculate the intrady stock returns for S&P 500 constituents */
+/* Author: Zhuoran 
 
 %let wrds=wrds.wharton.upenn.edu 4016;
 options comamid=TCP remote=WRDS;
